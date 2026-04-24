@@ -1,0 +1,272 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="dashboard-simple roommate-theme">
+    <div class="container small-container">
+        <!-- PROFILE HEADER -->
+        <div class="profile-header-card">
+            <div class="profile-main">
+                <div class="profile-photo-wrapper">
+                    {% if user.profile_image %}
+                        <img src="{{ user.profile_image.url }}" alt="{{ user.username }}" class="profile-photo">
+                    {% else %}
+                        <div class="profile-photo-fallback">
+                            <span>{{ user.first_name|first|default:user.username|first|upper }}</span>
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="profile-details">
+                    <span class="role-badge">Roommate</span>
+                    <h1>{{ user.get_full_name|default:user.username }}</h1>
+                    <p class="user-meta" style="margin-bottom: 8px;">{{ user.email }} &middot; {{ user.phone|default:"No phone set" }}</p>
+                    <p class="user-meta" style="margin-top: 0;">
+                        {% if avg_rating %}
+                            <strong style="color: #ff9f43; font-size: 1.1rem;">{{ avg_rating }} ⭐</strong> ({{ user_reviews.count }} reviews received)
+                        {% else %}
+                            <span style="color: #64748b; font-style: italic;">No reviews received yet</span>
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+            <div class="profile-actions">
+                <a href="#" class="btn btn-primary create-post-btn">Post Room Listing</a>
+                {% if not residencies %}
+                    <a href="#" class="btn btn-secondary">Register My Building</a>
+                {% endif %}
+                <a href="#" class="btn btn-secondary edit-profile-btn">Edit Profile</a>
+                <a href="{% url 'logout' %}" class="btn btn-secondary">Logout</a>
+            </div>
+        </div>
+
+        <!-- LIFESTYLE PREFERENCES -->
+        <div class="data-section">
+            <div class="section-top">
+                <h3>Lifestyle Matrix</h3>
+                <p>These preferences help us find your perfect matches.</p>
+            </div>
+            <div class="tag-list">
+                {% for pref in profile.preferences.all %}
+                    <span class="livo-tag">{{ pref.name }}</span>
+                {% empty %}
+                    <p class="empty-text">No preferences selected yet.</p>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- MY BUILDINGS SECTION -->
+        <div class="data-section mt-30">
+            <div class="section-top">
+                <h3>My Buildings</h3>
+                <p>Apartments you are registered as living in.</p>
+            </div>
+            
+            <div class="building-list">
+                {% for residency in residencies %}
+                    <div class="building-card">
+                        <div class="building-info">
+                            <h4>{{ residency.apartment.name }}</h4>
+                            <span class="building-location">{{ residency.apartment.area }}, {{ residency.apartment.city }}</span>
+                        </div>
+                        <div class="building-actions" style="margin-left: auto; margin-right: 20px;">
+                            <form action="#" method="POST" style="margin: 0;">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-danger compact" onclick="return confirm('Are you sure you want to remove this apartment?');">Remove</button>
+                            </form>
+                        </div>
+                        <div class="building-id-badge">
+                            <span class="id-label">ID</span>
+                            <span class="id-number">LIVO-{{ residency.apartment.id|stringformat:"04d" }}</span>
+                        </div>
+                    </div>
+                {% empty %}
+                    <p class="empty-text">You haven't joined any buildings yet.</p>
+                {% endfor %}
+            </div>
+
+            {% if residencies %}
+                <div class="one-apt-notice">
+                    <span class="notice-icon">🔒</span>
+                    <div>
+                        <strong>One apartment limit reached</strong>
+                        <p>You can only be registered to one apartment at a time. Remove your current apartment above to join or register a new one.</p>
+                    </div>
+                </div>
+            {% else %}
+                <div class="join-building-box">
+                    <h4>Join an Existing Building</h4>
+                    <p>Did your roommate or owner already register the apartment? Ask them for the Building ID (e.g., LIVO-0004) and enter it below to join.</p>
+                    <form action="#" method="POST" class="join-form">
+                        {% csrf_token %}
+                        <div class="input-wrapper">
+                            <input type="text" name="building_id_input" placeholder="e.g. LIVO-0004 or 4" required>
+                            <button type="submit" class="btn btn-primary compact">Join Building</button>
+                        </div>
+                    </form>
+                </div>
+            {% endif %}
+        </div>
+        </div>
+
+        <!-- PEOPLE IN MY BUILDINGS SECTION -->
+        <div class="data-section mt-30">
+            <div class="section-top">
+                <h3>People in My Buildings</h3>
+                <p>Submit reviews for your roommates and apartment owners.</p>
+            </div>
+            
+            {% if messages %}
+                <div class="messages">
+                    {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }}" style="padding: 12px; margin-bottom: 20px; border-radius: 8px; {% if message.tags == 'success' %}background:#d1fae5; color:#065f46;{% else %}background:#fee2e2; color:#991b1b;{% endif %}">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            <div class="people-list" style="display: flex; flex-direction: column; gap: 20px;">
+                {% if not co_residents and not owners %}
+                    <p class="empty-text">No verified co-residents or owners found yet.</p>
+                {% endif %}
+
+                {% for person in owners %}
+                    <div class="person-card" style="padding: 20px; background: #fff; border: 1px solid #e2e8f0; border-radius: 16px; box-shadow: 0 4px 6px rgba(0,0,0,0.02); display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 20px;">
+                        <div class="person-info" style="display: flex; align-items: center; gap: 16px;">
+                            <div class="circle" style="width: 50px; height: 50px; border-radius: 50%; overflow: hidden; background: #e4e6eb;">
+                                {% if person.profile_image %}
+                                    <img src="{{ person.profile_image.url }}" alt="{{ person.first_name }}" style="width:100%; height:100%; object-fit:cover;">
+                                {% else %}
+                                    <div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-weight: 700; color: #65676b;">
+                                        {{ person.first_name|first|default:person.username|first|upper }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            <div>
+                                <h4 style="margin: 0 0 4px 0; font-size: 1.1rem; color: #0f172a;">{{ person.get_full_name|default:person.username }}</h4>
+                                <span class="role-badge" style="background:#f1f5f9; color:#475569; padding:2px 8px; font-size:0.7rem;">Apartment Owner</span>
+                            </div>
+                        </div>
+                        
+                        <div class="review-form-wrapper" style="flex-grow: 1; max-width: 400px; min-width: 280px;">
+                            <form action="#" method="POST" style="display: flex; flex-direction: column; gap: 10px; background:#f8fafc; padding: 16px; border-radius:12px; border:1px solid #e2e8f0;">
+                                {% csrf_token %}
+                                <input type="hidden" name="reviewed_user_id" value="{{ person.id }}">
+                                
+                                <div style="display: flex; gap: 10px; align-items: center;">
+                                    <strong style="font-size:0.85rem; color:#64748b; text-transform:uppercase;">Rating:</strong>
+                                    <select name="rating" required style="padding: 6px 12px; border-radius: 6px; border: 1px solid #cbd5e1;">
+                                        <option value="5">5 ⭐ - Excellent</option>
+                                        <option value="4">4 ⭐ - Good</option>
+                                        <option value="3">3 ⭐ - Average</option>
+                                        <option value="2">2 ⭐ - Poor</option>
+                                        <option value="1">1 ⭐ - Terrible</option>
+                                    </select>
+                                </div>
+                                <input type="text" name="comment" placeholder="Write your review experience..." required style="padding: 10px; border-radius: 8px; border: 1px solid #cbd5e1; width: 100%;">
+                                <button type="submit" class="btn btn-primary compact" style="align-self: flex-end; padding:8px 16px; font-size:0.85rem;">Submit Review</button>
+                            </form>
+                        </div>
+                    </div>
+                {% endfor %}
+
+                {% for person in co_residents %}
+                    <div class="person-card" style="padding: 20px; background: #fff; border: 1px solid #e2e8f0; border-radius: 16px; box-shadow: 0 4px 6px rgba(0,0,0,0.02); display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 20px;">
+                        <div class="person-info" style="display: flex; align-items: center; gap: 16px;">
+                            <div class="circle" style="width: 50px; height: 50px; border-radius: 50%; overflow: hidden; background: #e4e6eb;">
+                                {% if person.profile_image %}
+                                    <img src="{{ person.profile_image.url }}" alt="{{ person.first_name }}" style="width:100%; height:100%; object-fit:cover;">
+                                {% else %}
+                                    <div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-weight: 700; color: #65676b;">
+                                        {{ person.first_name|first|default:person.username|first|upper }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            <div>
+                                <h4 style="margin: 0 0 4px 0; font-size: 1.1rem; color: #0f172a;">{{ person.get_full_name|default:person.username }}</h4>
+                                <span class="role-badge" style="background:#fff1f2; color:#ff4757; padding:2px 8px; font-size:0.7rem;">Co-Resident</span>
+                            </div>
+                        </div>
+                        
+                        <div class="review-form-wrapper" style="flex-grow: 1; max-width: 400px; min-width: 280px;">
+                            <form action="#" method="POST" style="display: flex; flex-direction: column; gap: 10px; background:#f8fafc; padding: 16px; border-radius:12px; border:1px solid #e2e8f0;">
+                                {% csrf_token %}
+                                <input type="hidden" name="reviewed_user_id" value="{{ person.id }}">
+                                
+                                <div style="display: flex; gap: 10px; align-items: center;">
+                                    <strong style="font-size:0.85rem; color:#64748b; text-transform:uppercase;">Rating:</strong>
+                                    <select name="rating" required style="padding: 6px 12px; border-radius: 6px; border: 1px solid #cbd5e1;">
+                                        <option value="5">5 ⭐ - Excellent</option>
+                                        <option value="4">4 ⭐ - Good</option>
+                                        <option value="3">3 ⭐ - Average</option>
+                                        <option value="2">2 ⭐ - Poor</option>
+                                        <option value="1">1 ⭐ - Terrible</option>
+                                    </select>
+                                </div>
+                                <input type="text" name="comment" placeholder="Write your review experience..." required style="padding: 10px; border-radius: 8px; border: 1px solid #cbd5e1; width: 100%;">
+                                <button type="submit" class="btn btn-primary compact" style="align-self: flex-end; padding:8px 16px; font-size:0.85rem;">Submit Review</button>
+                            </form>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<style>
+    .mt-30 { margin-top: 30px; }
+    
+    .building-list { display: flex; flex-direction: column; gap: 16px; margin-bottom: 30px; }
+    .building-card { display: flex; justify-content: space-between; align-items: center; padding: 20px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 16px; }
+    .building-info h4 { margin: 0 0 4px 0; font-size: 1.1rem; color: #0f172a; }
+    .building-location { font-size: 0.85rem; color: #64748b; font-weight: 500; }
+    
+    .building-id-badge { display: flex; flex-direction: column; align-items: center; background: #0f172a; color: white; padding: 8px 16px; border-radius: 12px; }
+    .id-label { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.1em; opacity: 0.8; margin-bottom: 2px; }
+    .id-number { font-size: 1rem; font-weight: 800; }
+
+    .join-building-box { background: #fff1f2; padding: 24px; border-radius: 16px; border: 1px dashed #ff4757; }
+    .join-building-box h4 { margin: 0 0 8px 0; color: #ff4757; font-size: 1.1rem; }
+    .join-building-box p { font-size: 0.9rem; color: #475569; margin-bottom: 16px; line-height: 1.5; }
+    
+    .join-form .input-wrapper { display: flex; gap: 10px; }
+    .join-form input { flex-grow: 1; padding: 12px 16px; border-radius: 12px; border: 1px solid #cbd5e1; font-size: 1rem; }
+    .btn.compact { padding: 12px 20px; }
+
+    .dashboard-simple { background: #fafbfc; min-height: 90vh; padding: 60px 0; font-family: 'Inter', sans-serif; }
+    .small-container { max-width: 800px; margin: 0 auto; }
+
+    .profile-header-card { background: white; border-radius: 24px; padding: 40px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #e2e8f0; margin-bottom: 30px; box-shadow: 0 4px 6px rgba(0,0,0,0.02); }
+    .profile-main { display: flex; align-items: center; gap: 24px; }
+    
+    .profile-photo-wrapper { width: 90px; height: 90px; }
+    .profile-photo { width: 100%; height: 100%; border-radius: 24px; object-fit: cover; }
+    .profile-photo-fallback { width: 100%; height: 100%; background: #ff4757; border-radius: 24px; display: flex; align-items: center; justify-content: center; color: white; font-size: 2.2rem; font-weight: 800; }
+
+    .role-badge { background: #fff1f2; color: #ff4757; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; padding: 4px 12px; border-radius: 50px; margin-bottom: 8px; display: inline-block; }
+    .profile-details h1 { font-size: 1.8rem; font-weight: 800; color: #0f172a; margin: 0; letter-spacing: -0.5px; }
+    .user-meta { color: #64748b; font-size: 0.95rem; margin-top: 4px; }
+
+    .profile-actions { display: flex; gap: 12px; flex-direction: column; }
+    
+    .data-section { background: white; border-radius: 24px; padding: 40px; border: 1px solid #e2e8f0; }
+    .section-top { margin-bottom: 24px; }
+    .section-top h3 { font-size: 1.2rem; font-weight: 700; color: #0f172a; }
+    .section-top p { font-size: 0.9rem; color: #64748b; }
+
+    .tag-list { display: flex; flex-wrap: wrap; gap: 10px; }
+    .livo-tag { background: #f1f5f9; color: #475569; padding: 8px 16px; border-radius: 50px; font-weight: 600; font-size: 0.85rem; border: 1px solid #e2e8f0; }
+
+    .btn { padding: 12px 24px; border-radius: 12px; font-weight: 700; text-decoration: none; text-align: center; font-size: 0.9rem; cursor: pointer; }
+    .btn-primary { background: #ff4757; color: white; border: none; }
+    .btn-secondary { background: #f1f5f9; color: #475569; border: none; }
+    .btn-danger { background: #fee2e2; color: #dc2626; border: 1px solid #fecaca; }
+
+    .one-apt-notice { display: flex; align-items: flex-start; gap: 14px; background: #fffbeb; border: 1px solid #fde68a; border-radius: 16px; padding: 20px 24px; }
+    .one-apt-notice .notice-icon { font-size: 1.5rem; flex-shrink: 0; }
+    .one-apt-notice strong { display: block; color: #92400e; font-size: 0.95rem; margin-bottom: 4px; }
+    .one-apt-notice p { color: #78350f; font-size: 0.85rem; margin: 0; line-height: 1.5; }
+</style>
+{% endblock %}

@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}LIVO | Digital Curation for Modern Living{% endblock %}</title>
+    <meta name="description"
+        content="{% block meta_description %}LIVO is a curated platform for finding the perfect roommate, managing shared living expenses, and discovering local household services.{% endblock %}">
+    <meta name="keywords" content="LIVO, roommate finder, shared living, house share, curated homes">
+    <meta property="og:title" content="LIVO | Digital Curation for Modern Living">
+    <meta property="og:description" content="Find perfect roommates and simplify your shared life with LIVO.">
+    <meta property="og:type" content="website">
+    <!-- Design System Styles -->
+    <link rel="stylesheet" href="{% static 'css/variables.css' %}">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+
+    {% block extra_css %}{% endblock %}
+</head>
+
+<body>
+    <header class="header">
+        <div class="container nav">
+            <a href="/" class="logo">LIVO</a>
+            <nav class="nav-links">
+                <a href="#">Rooms</a>
+                <a href="#">Househelp</a>
+            </nav>
+            <div class="nav-actions">
+                {% if user.is_authenticated %}
+                <a href="#" class="nav-profile" title="My Dashboard">
+                    {% if user.profile_image %}
+                    <img src="{{ user.profile_image.url }}" alt="{{ user.username }}" class="nav-avatar">
+                    {% else %}
+                    <div class="nav-avatar-fallback">
+                        <span>{{ user.first_name|first|default:user.username|first|upper }}</span>
+                    </div>
+                    {% endif %}
+                </a>
+                <a href="{% url 'logout' %}" class="btn btn-secondary btn-sm">Log Out</a>
+                {% else %}
+                <a href="{% url 'login' %}" class="btn btn-secondary btn-sm">Log In</a>
+                <a href="{% url 'signup' %}" class="btn btn-primary btn-sm">Sign Up</a>
+                {% endif %}
+            </div>
+        </div>
+    </header>
+
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="section surface-nest" style="padding: 60px 0;">
+        <div class="container"
+            style="display: flex; flex-direction: column; align-items: center; text-align: center; gap: 32px;">
+            <div class="logo">LIVO</div>
+            <div class="footer-links" style="display: flex; gap: 24px; font-size: 14px; opacity: 0.7;">
+                <a href="#">Privacy Policy</a>
+                <a href="#">Terms of Service</a>
+                <a href="#">Community Guidelines</a>
+                <a href="#">Support</a>
+            </div>
+            <p style="font-size: 14px; opacity: 0.5;">&copy; 2024 LIVO Digital Curation. All rights reserved.</p>
+        </div>
+    </footer>
+
+    {% block extra_js %}{% endblock %}
+</body>
+
+</html>

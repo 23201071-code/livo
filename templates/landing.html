@@ -1,0 +1,127 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="section hero" style="padding-top: 40px;">
+    <div class="container editorial-grid" style="align-items: center;">
+        <div style="grid-column: 1 / span 6;">
+            <h1 class="display-lg">Your living,<br><span style="color: var(--livo-red);">curated.</span></h1>
+            <p class="body-lg" style="margin-bottom: 40px; max-width: 480px;">
+                Find perfect roommates and simplify your shared life through a beautifully designed, social-first experience.
+            </p>
+            <div style="display: flex; gap: 16px;">
+                <a href="#" class="btn btn-primary">Find Roommates</a>
+                <a href="#" class="btn btn-secondary">Explore Homes</a>
+            </div>
+        </div>
+        <div style="grid-column: 7 / span 6; position: relative; padding-bottom: 48px;">
+            <div style="border-radius: var(--radius-xl); overflow: hidden; height: 600px;">
+                <img src="{% static 'images/hero.png' %}" alt="Modern LIVO Living" style="width: 100%; height: 100%; object-fit: cover;">
+            </div>
+            <!-- Editorial Asymmetric Overlay -->
+            <div class="card hero-testimonial-card" style="position: absolute; bottom: -40px; left: -100px; width: 340px; padding: 24px;">
+                <div style="display: flex; align-items: center; gap: 16px; margin-bottom: 12px;">
+                    <div style="width: 48px; height: 48px; border-radius: 50%; background: var(--livo-red-container);"></div>
+                    <div>
+                        <div style="font-weight: 600; font-size: 14px;">Marcus Chen</div>
+                        <div style="font-size: 12px; color: var(--secondary);">Looking for Roommate</div>
+                    </div>
+                </div>
+                <p style="font-size: 13px; font-style: italic; color: var(--on-surface);">"Found my best friend and a beautiful home in Chelsea within 48 hours."</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Features Section -->
+<section class="section surface-nest">
+    <div class="container">
+        <div style="text-align: center; margin-bottom: 80px;">
+            <h2 class="headline-md">Designed for how you live today.</h2>
+        </div>
+        
+        <div class="editorial-grid">
+            <div class="card" style="grid-column: 1 / span 4;">
+                <h3 style="margin-bottom: 16px;">Precision Compatibility</h3>
+                <p class="body-md">Our curation algorithm matches you based on aesthetic, lifestyle, and shared values.</p>
+            </div>
+            <div class="card" style="grid-column: 5 / span 4;">
+                <h3 style="margin-bottom: 16px;">Split & Sip</h3>
+                <p class="body-md">Never talk about money again. Shared groceries, bills, and rent handled in one tap.</p>
+            </div>
+            <div class="card" style="grid-column: 9 / span 4;">
+                <h3 style="margin-bottom: 16px;">Curated Listings</h3>
+                <p class="body-md">Every home verified for design and quality.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Househould Services -->
+<section class="section">
+    <div class="container editorial-grid" style="align-items: center;">
+        <div style="grid-column: 1 / span 6;">
+            <div style="border-radius: var(--radius-xl); overflow: hidden; height: 500px;">
+                <img src="{% static 'images/features.png' %}" alt="LIVO Services" style="width: 100%; height: 100%; object-fit: cover;">
+            </div>
+        </div>
+        <div style="grid-column: 8 / span 5;">
+            <h2 class="headline-md">Household Services</h2>
+            <p class="body-lg" style="margin-bottom: 32px;">Seamlessly manage your home life with curated local professional services.</p>
+            
+            <div style="display: flex; flex-direction: column; gap: 24px;">
+                <div style="display: flex; gap: 20px; align-items: start;">
+                    <div style="padding: 12px; background: var(--surface-low); border-radius: 12px; font-weight: bold; color: var(--livo-red);">01</div>
+                    <div>
+                        <h4 style="margin-bottom: 8px;">Search Househelp</h4>
+                        <p style="font-size: 14px; color: var(--secondary);">Find professional upkeep services tailored to your household preferences.</p>
+                    </div>
+                </div>
+                <div style="display: flex; gap: 20px; align-items: start;">
+                    <div style="padding: 12px; background: var(--surface-low); border-radius: 12px; font-weight: bold; color: var(--livo-red);">02</div>
+                    <div>
+                        <h4 style="margin-bottom: 8px;">Discover Homemade Food</h4>
+                        <p style="font-size: 14px; color: var(--secondary);">Connect with local vendors for fresh, homemade meal options.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Testimonials -->
+<section class="section surface-nest">
+    <div class="container">
+        <h2 class="headline-md" style="text-align: center;">Loved by modern dwellers.</h2>
+        <div class="editorial-grid" style="margin-top: 60px;">
+            <div class="card" style="grid-column: 1 / span 4; border: 1px solid var(--outline-variant); background: transparent;">
+                <p style="margin-bottom: 24px; font-style: italic;">"LIVO turned the nightmare of moving into an editorial experience. I found my current flatmate here and couldn't be happier."</p>
+                <div style="font-weight: 600;">Sarah Jenkins</div>
+                <div style="font-size: 12px; color: var(--secondary);">Brooklyn, NY</div>
+            </div>
+            <div class="card" style="grid-column: 5 / span 4; border: 1px solid var(--outline-variant); background: transparent;">
+                <p style="margin-bottom: 24px; font-style: italic;">"The only app that actually understands aesthetic and lifestyle compatibility. It's more than housing, it's community."</p>
+                <div style="font-weight: 600;">David Miller</div>
+                <div style="font-size: 12px; color: var(--secondary);">London, UK</div>
+            </div>
+            <div class="card" style="grid-column: 9 / span 4; border: 1px solid var(--outline-variant); background: transparent;">
+                <p style="margin-bottom: 24px; font-style: italic;">"Handling expenses through LIVO saved my friendship with my roommate. No more awkward 'who owes what' texts."</p>
+                <div style="font-weight: 600;">Elena Rodriguez</div>
+                <div style="font-size: 12px; color: var(--secondary);">San Francisco, CA</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA Section -->
+<section class="section" style="background: var(--livo-red-deep); color: white; text-align: center;">
+    <div class="container">
+        <h2 class="headline-md" style="color: white;">Ready to elevate your living?</h2>
+        <p style="margin-bottom: 40px; opacity: 0.8; max-width: 600px; margin-left: auto; margin-right: auto;">
+            Join 50,000+ people who have found their perfect home and community through LIVO's curated platform.
+        </p>
+        <a href="#" class="btn btn-primary" style="background: white; color: var(--livo-red);">Get Started Free</a>
+    </div>
+</section>
+{% endblock %}

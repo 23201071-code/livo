@@ -1,0 +1,508 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="auth-page">
+    <div class="auth-wrapper">
+        <!-- Error Reporting -->
+        {% if form.errors %}
+        <div class="error-banner">
+            <p>Please correct the issues below to join the collective.</p>
+            {% if form.non_field_errors %}
+            <ul class="errorlist nonfield">
+                {% for error in form.non_field_errors %}<li>{{ error }}</li>{% endfor %}
+            </ul>
+            {% endif %}
+        </div>
+        {% endif %}
+
+        <div class="step-indicator">
+            <div class="indicator-dot active" id="dot-1"></div>
+            <div class="indicator-dot" id="dot-2"></div>
+            <div class="indicator-dot" id="dot-3"></div>
+        </div>
+
+        <form method="post" class="signup-form" id="signup-stepper" enctype="multipart/form-data" novalidate>
+            {% csrf_token %}
+
+            <!-- STEP 1: ROLE SELECTION -->
+            <div class="step active" id="step-1">
+                <div class="step-header">
+                    <h1 class="logo-text">LIVO</h1>
+                    <h2>How will you contribute?</h2>
+                    <p>Select your primary role in the ecosystem.</p>
+                </div>
+
+                <div class="role-selector-grid">
+                    {% for radio in form.role %}
+                    <label class="role-option" for="{{ radio.id_for_label }}">
+                        {{ radio.tag }}
+                        <div class="role-box">
+                            <div class="role-icon">
+                                {% if radio.choice_label == 'Roommate' %}🏠
+                                {% elif radio.choice_label == 'House Owner'%}🔑
+                                {% elif radio.choice_label == 'House Help' %}🧹
+                                {% else %}📦{% endif %}
+                            </div>
+                            <div class="role-info">
+                                <span class="role-name">{{ radio.choice_label }}</span>
+                                <span class="role-desc">
+                                    {% if radio.choice_label == 'Roommate' %}Find shared homes
+                                    {% elif radio.choice_label == 'House Owner' %}List your properties
+                                    {% elif radio.choice_label == 'House Help' %}Provide home services
+                                    {% else %}Sell goods/meals{% endif %}
+                                </span>
+                            </div>
+                        </div>
+                    </label>
+                    {% endfor %}
+                    {% if form.role.errors %}<div class="field-error role-error">{{ form.role.errors }}</div>{% endif %}
+                </div>
+
+                <div class="step-actions">
+                    <button type="button" class="btn btn-primary btn-lg" onclick="goToStep(2)">Next: Account
+                        Details</button>
+                </div>
+            </div>
+
+            <!-- STEP 2: ACCOUNT DETAILS -->
+            <div class="step" id="step-2">
+                <div class="step-header">
+                    <h2>Account Credentials</h2>
+                    <p>Enter your basic profile information.</p>
+                </div>
+
+                <div class="form-layout">
+                    <div class="field-split">
+                        <div class="field-item">
+                            <label>First Name</label>
+                            {{ form.first_name }}
+                            {% if form.first_name.errors %}<div class="field-error">{{ form.first_name.errors }}</div>{% endif %}
+                        </div>
+                        <div class="field-item">
+                            <label>Last Name</label>
+                            {{ form.last_name }}
+                            {% if form.last_name.errors %}<div class="field-error">{{ form.last_name.errors }}</div>{% endif %}
+                        </div>
+                    </div>
+
+                    <div class="field-split">
+                        <div class="field-item">
+                            <label>Email Address</label>
+                            {{ form.email }}
+                            {% if form.email.errors %}<div class="field-error">{{ form.email.errors }}</div>{% endif %}
+                        </div>
+                        <div class="field-item">
+                            <label>Phone Number</label>
+                            {{ form.phone }}
+                            {% if form.phone.errors %}<div class="field-error">{{ form.phone.errors }}</div>{% endif %}
+                        </div>
+                    </div>
+
+                    <div class="field-split">
+                        <div class="field-item">
+                            <label>Username</label>
+                            {{ form.username }}
+                            {% if form.username.errors %}<div class="field-error">{{ form.username.errors }}</div>{% endif %}
+                        </div>
+                        <div class="field-item">
+                            <label>Contact Link (LinkedIn/Portfolio)</label>
+                            {{ form.contact_link }}
+                            {% if form.contact_link.errors %}<div class="field-error">{{ form.contact_link.errors }}</div>{% endif %}
+                        </div>
+                    </div>
+
+                    <div class="field-item">
+                        <label>Profile Image</label>
+                        {{ form.profile_image }}
+                        {% if form.profile_image.errors %}<div class="field-error">{{ form.profile_image.errors }}</div>{% endif %}
+                    </div>
+
+                    <div class="field-item">
+                        <label>Password</label>
+                        {{ form.password1 }}
+                        {% if form.password1.errors %}<div class="field-error">{{ form.password1.errors }}</div>{% endif %}
+                    </div>
+
+                    <div class="field-item">
+                        <label>Confirm Password</label>
+                        {{ form.password2 }}
+                        {% if form.password2.errors %}<div class="field-error">{{ form.password2.errors }}</div>{% endif %}
+                    </div>
+
+                    <div class="field-item">
+                        <label>Gender Identity</label>
+                        {{ form.gender }}
+                        {% if form.gender.errors %}<div class="field-error">{{ form.gender.errors }}</div>{% endif %}
+                    </div>
+                </div>
+
+                <div class="step-actions">
+                    <button type="button" class="btn btn-secondary" onclick="goToStep(1)">Back</button>
+                    <button type="button" class="btn btn-primary" id="step2-next-btn" onclick="handleStep2Next()">Next:
+                        Personalize</button>
+                    <button type="submit" class="btn btn-primary premium-glow" id="step2-submit-btn"
+                        style="display: none;">Complete Sign Up</button>
+                </div>
+            </div>
+
+            <!-- STEP 3: PERSONALIZATION -->
+            <div class="step" id="step-3">
+                <div class="step-header">
+                    <h2>Refine Your Profile</h2>
+                    <p>Final details based on your chosen role.</p>
+                </div>
+
+                <div id="roommate-fields" class="dynamic-section" style="display: none;">
+                    {% for category, tags in grouped_preferences.items %}
+                    <div class="preference-group">
+                        <h3 class="category-heading">{{ category }}</h3>
+                        <div class="tag-grid">
+                            {% for tag in tags %}
+                            <div class="tag-item">
+                                <input type="checkbox" name="preferences" value="{{ tag.id }}" id="pref_{{ tag.id }}">
+                                <label for="pref_{{ tag.id }}">{{ tag.name }}</label>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                    {% if form.preferences.errors %}<div class="field-error">{{ form.preferences.errors }}</div>{% endif %}
+                </div>
+
+                <div id="househelp-fields" class="dynamic-section" style="display: none;">
+                    <h3 class="category-heading">Professional Expertise</h3>
+                    <div class="tag-grid">
+                        {% for choice in form.skills %}
+                        <div class="tag-item">
+                            <input type="checkbox" name="skills" value="{{ choice.data.value }}"
+                                id="{{ choice.id_for_label }}">
+                            <label for="{{ choice.id_for_label }}">{{ choice.choice_label }}</label>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    <!-- 💰 Expected Salary Input -->
+                    <div class="form-group mt-4">
+                        <h3 class="category-heading">Expected Monthly Salary</h3>
+                        {{ form.expected_salary }}
+                        {% if form.expected_salary.errors %}
+                        <div class="field-error">{{ form.expected_salary.errors }}</div>
+                        {% endif %}
+                    </div>
+                    {% if form.skills.errors %}<div class="field-error">{{ form.skills.errors }}</div>{% endif %}
+                </div>
+
+                <div class="step-actions">
+                    <button type="button" class="btn btn-secondary" onclick="goToStep(2)">Back</button>
+                    <button type="submit" class="btn btn-primary premium-glow">Complete Sign Up</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+    .error-banner {
+        background: #fff5f5;
+        border-left: 4px solid #ff4757;
+        padding: 16px;
+        border-radius: 8px;
+        margin-bottom: 24px;
+    }
+
+    .error-banner p {
+        color: #c53030;
+        font-weight: 700;
+        margin-bottom: 8px;
+    }
+
+    .errorlist {
+        color: #c53030;
+        font-size: 0.85rem;
+        padding-left: 20px;
+    }
+
+    .field-error {
+        color: #ff4757;
+        font-size: 0.8rem;
+        margin-top: 4px;
+        font-weight: 500;
+    }
+
+    .tag-grid {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 10px;
+        margin-bottom: 25px;
+    }
+
+    .tag-item {
+        position: relative;
+    }
+
+    .tag-item input {
+        position: absolute;
+        opacity: 0;
+        width: 0;
+        height: 0;
+    }
+
+    .tag-item label {
+        display: inline-block;
+        padding: 10px 20px;
+        background: #f1f5f9;
+        border: 1px solid #e2e8f0;
+        border-radius: 50px;
+        font-size: 0.85rem;
+        font-weight: 500;
+        color: #475569;
+        cursor: pointer;
+        transition: all 0.2s;
+        user-select: none;
+    }
+
+    .tag-item input:checked+label {
+        background: #ff4757;
+        color: white;
+        border-color: #ff4757;
+        box-shadow: 0 4px 12px rgba(255, 71, 87, 0.25);
+    }
+
+    .category-heading {
+        font-size: 0.95rem;
+        font-weight: 700;
+        color: #1e293b;
+        margin-bottom: 12px;
+        text-transform: uppercase;
+        border-left: 3px solid #ff4757;
+        padding-left: 10px;
+    }
+
+    .preference-group {
+        margin-bottom: 30px;
+    }
+
+    .auth-page {
+        background: #fafbfc;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 60px 20px;
+    }
+
+    .auth-wrapper {
+        background: #fff;
+        width: 100%;
+        max-width: 600px;
+        border-radius: 24px;
+        box-shadow: 0 12px 48px rgba(0, 0, 0, 0.08);
+        border: 1px solid #ebedf0;
+        padding: 50px;
+    }
+
+    .step-indicator {
+        display: flex;
+        gap: 8px;
+        justify-content: center;
+        margin-bottom: 32px;
+    }
+
+    .indicator-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: #e2e8f0;
+    }
+
+    .indicator-dot.active {
+        width: 24px;
+        border-radius: 4px;
+        background: #ff4757;
+    }
+
+    .logo-text {
+        font-weight: 900;
+        font-size: 2.2rem;
+        color: #ff4757;
+        text-align: center;
+    }
+
+    .step-header {
+        text-align: center;
+        margin-bottom: 40px;
+    }
+
+    .step {
+        display: none;
+    }
+
+    .step.active {
+        display: block;
+        animation: slideIn 0.3s ease-out;
+    }
+
+    .form-layout {
+        display: grid;
+        gap: 20px;
+    }
+
+    .field-split {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+    }
+
+    .field-item label {
+        display: block;
+        font-weight: 600;
+        font-size: 0.85rem;
+        margin-bottom: 6px;
+        color: #475569;
+    }
+
+    .form-layout input,
+    .form-layout select,
+    .form-control {
+        width: 100%;
+        padding: 12px 14px;
+        border: 1px solid #cbd5e1;
+        border-radius: 10px;
+        font-size: 0.95rem;
+        transition: all 0.2s;
+    }
+
+    .form-layout input:focus,
+    .form-layout select:focus,
+    .form-control:focus {
+        border-color: #ff4757;
+        box-shadow: 0 0 0 3px rgba(255, 71, 87, 0.1);
+        outline: none;
+    }
+
+    .step-actions {
+        display: flex;
+        gap: 12px;
+        margin-top: 36px;
+    }
+
+    .btn {
+        padding: 14px 24px;
+        border-radius: 12px;
+        font-weight: 600;
+        cursor: pointer;
+        border: none;
+        flex: 1;
+        transition: all 0.2s;
+    }
+
+    .btn:hover {
+        opacity: 0.9;
+        transform: translateY(-1px);
+    }
+
+    .btn-lg {
+        width: 100%;
+    }
+
+    .btn-primary {
+        background: #ff4757;
+        color: white;
+    }
+
+    .btn-secondary {
+        background: #f1f5f9;
+        color: #475569;
+    }
+
+    .role-selector-grid {
+        display: grid;
+        gap: 12px;
+    }
+
+    .role-option input {
+        display: none;
+    }
+
+    .role-box {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        padding: 18px;
+        border: 2px solid #edeff2;
+        border-radius: 16px;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .role-option input:checked+.role-box {
+        border-color: #ff4757;
+        background: #fff5f5;
+    }
+
+    @keyframes slideIn {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+</style>
+
+<script>
+    function goToStep(stepNumber) {
+        document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+        document.querySelectorAll('.indicator-dot').forEach((d, i) => {
+            if (i < stepNumber) d.classList.add('active');
+            else d.classList.remove('active');
+        });
+
+        const role = document.querySelector('input[name="role"]:checked')?.value;
+        const nextBtn = document.getElementById('step2-next-btn');
+        const submitBtn = document.getElementById('step2-submit-btn');
+        const dot3 = document.getElementById('dot-3');
+
+        if (role === 'HOUSE_OWNER' || role === 'VENDOR') {
+            nextBtn.style.display = 'none';
+            submitBtn.style.display = 'block';
+            if (dot3) dot3.style.display = 'none';
+        } else {
+            nextBtn.style.display = 'block';
+            submitBtn.style.display = 'none';
+            if (dot3) dot3.style.display = 'block';
+        }
+
+        if (stepNumber === 3) {
+            document.getElementById('roommate-fields').style.display = (role === 'ROOMMATE') ? 'block' : 'none';
+            document.getElementById('househelp-fields').style.display = (role === 'HOUSE_HELP') ? 'block' : 'none';
+        }
+
+        document.getElementById(`step-${stepNumber}`).classList.add('active');
+        window.scrollTo(0, 0);
+    }
+
+    function handleStep2Next() {
+        goToStep(3);
+    }
+
+    window.onload = function () {
+        if (document.querySelector('.error-banner')) {
+            const step3Errors = document.querySelector('#step-3 .field-error');
+            const step2Errors = document.querySelector('#step-2 .field-error');
+            const step1Errors = document.querySelector('#step-1 .field-error');
+
+            if (step3Errors) {
+                goToStep(2); // Jump to 2 first to set state
+                goToStep(3); // Then 3
+            }
+            else if (step2Errors) goToStep(2);
+            else if (step1Errors) goToStep(1);
+        }
+    }
+</script>
+{% endblock %}
