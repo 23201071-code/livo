@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="profile-page apartment-theme">
+    <div class="container small-container">
+        <!-- APARTMENT HEADER CARD -->
+        <div class="profile-header-card">
+            <div class="profile-main">
+                <div class="profile-photo-wrapper">
+                    <div class="profile-photo-fallback" style="background: #1877f2;">
+                        <span>🏢</span>
+                    </div>
+                </div>
+                <div class="profile-details">
+                    <span class="role-badge">Apartment Entity</span>
+                    <h1>{{ apartment.name }}</h1>
+                    <p class="user-meta">{{ apartment.area }}, {{ apartment.city }}</p>
+                    <p class="user-meta" style="margin-top: 8px;">
+                        {% if avg_rating %}
+                            <strong style="color: #ff9f43; font-size: 1.1rem;">{{ avg_rating }} ⭐</strong> ({{ reviews.count }} reviews)
+                        {% else %}
+                            <span style="color: #64748b; font-style: italic;">No ratings yet</span>
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
