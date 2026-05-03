@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="social-feed-page">
+    <div class="container container-feed-layout">
+
+        <!-- SIDEBAR (Fixed Filters) -->
+        <aside class="feed-sidebar">
+            <div class="sidebar-sticky">
+                <!-- CATEGORY INFO -->
+                <div class="sidebar-info-card">
+                    <span class="category-pill">{{ post_type }} COMMUNITY</span>
+                    <h1>{{ category_name }}</h1>
+                    <p>Discover opportunities and connect with neighbors in your local collective.</p>
+                </div>
+
+                <!-- FILTER BOX -->
+                <div class="filter-card">
+                    <div class="filter-header">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
+                        <h3>Refine Feed</h3>
+                    </div>
+
+                    <form method="GET" action="{% url 'feed' post_type %}" class="sidebar-filter-form">
+                        {% if post_type == 'ROOM' %}
+                            <div class="input-group">
+                                <label>City</label>
+                                <input type="text" name="city" placeholder="e.g. Dhaka" value="{{ request.GET.city }}">
+                            </div>
+                            <div class="input-group">
+                                <label>Area</label>
+                                <input type="text" name="area" placeholder="e.g. Gulshan" value="{{ request.GET.area }}">
+                            </div>
+                            <div class="input-group">
+                                <label>Max Budget</label>
+                                <div class="price-input-wrapper">
+                                    <span class="currency">৳</span>
+                                    <input type="number" name="max_price" placeholder="Rent limit" value="{{ request.GET.max_price }}">
+                                </div>
+                            </div>
+                        {% elif post_type == 'FOOD' %}
+                            <div class="input-group">
+                                <label>What are you looking for?</label>
+                                <input type="text" name="meal_type" placeholder="e.g. Pizza, Vegan" value="{{ request.GET.meal_type }}">
+                            </div>
+                            <div class="input-group">
+                                <label>Max Price</label>
+                                <div class="price-input-wrapper">
+                                    <span class="currency">$</span>
