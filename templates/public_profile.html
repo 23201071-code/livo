@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="dashboard-simple roommate-theme">
+    <div class="container small-container">
+        <!-- PROFILE HEADER -->
+        <div class="profile-header-card">
+            <div class="profile-main">
+                <div class="profile-photo-wrapper">
+                    {% if target_user.profile_image %}
+                        <img src="{{ target_user.profile_image.url }}" alt="{{ target_user.username }}" class="profile-photo">
+                    {% else %}
+                        <div class="profile-photo-fallback">
+                            <span>{{ target_user.first_name|first|default:target_user.username|first|upper }}</span>
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="profile-details">
+                    <span class="role-badge">{{ target_user.get_role_display }}</span>
+                    <h1>{{ target_user.get_full_name|default:target_user.username }}</h1>
+                    <p class="user-meta" style="margin-top: 8px;">
+                        {% if avg_rating %}
+                            <strong style="color: #ff9f43; font-size: 1.1rem;">{{ avg_rating }} ⭐</strong> ({{ reviews.count }} reviews)
+                        {% else %}
+                            <span style="color: #64748b; font-style: italic;">No reviews yet</span>
+                        {% endif %}
+                        
+                        {% if target_user.role == 'HOUSE_HELP' and profile %}
+                            <span style="margin-left: 10px; color: #1877f2; font-weight: 600;">&middot; 📍 {{ profile.area }}, {{ profile.city }}</span>
+                        {% endif %}
+                    </p>
+
+                </div>
+            </div>
+            <div class="profile-actions">
+                <a href="{{ target_user.contact_link|default:'#' }}" target="_blank" class="btn btn-primary create-post-btn">Contact {{ target_user.first_name }}</a>
+            </div>
+        </div>
+
+        {% if target_user.role == 'ROOMMATE' %}
+        {% if profile.bio %}
+        <!-- USER BIO -->
+        <div class="data-section" style="margin-bottom: 24px;">
+            <div class="section-top">
+                <h3>About {{ target_user.first_name }}</h3>
+            </div>
+            <p style="color: #475569; line-height: 1.6; font-style: italic; border-left: 3px solid #ff4757; padding-left: 15px;">
+                "{{ profile.bio }}"
+            </p>
+        </div>
+        {% endif %}
