@@ -348,4 +348,53 @@
                                 </div>
                             </div>
                         </div>
+                        </article>
+                {% empty %}
+                    <div class="empty-feed">
+                        <p>No posts available in this community yet.</p>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        </div>
+        </main>
+    </div>
+</div>
+
+<script>
+    // 1. Toggle Comments Visibility
+    function toggleComments(postId) {
+        const section = document.getElementById(`comments-section-${postId}`);
+        if (section.style.display === 'none') {
+            section.style.display = 'block';
+            section.classList.add('fade-in');
+        } else {
+            section.style.display = 'none';
+        }
+    }
+
+    // 2. Fetch API: Toggle Like
+    async function toggleLike(postId) {
+        try {
+            const response = await fetch(`/posts/like/${postId}/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}',
+                    'Content-Type': 'application/json'
+                }
+            });
+            const data = await response.json();
+            if (data.status === 'success') {
+                const countElement = document.getElementById(`likes-count-${postId}`);
+                countElement.innerText = data.likes_count;
+
+                // Add pop effect
+                const btn = document.querySelector(`#post-${postId} .like-btn`);
+                btn.classList.add('liked-animate');
+                setTimeout(() => btn.classList.remove('liked-animate'), 300);
+            }
+        } catch (error) {
+            console.error('Error liking post:', error);
+        }
+    }
+
 
