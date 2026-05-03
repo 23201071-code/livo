@@ -1,0 +1,181 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="profile-page apartment-theme">
+    <div class="container small-container">
+        <!-- APARTMENT HEADER CARD -->
+        <div class="profile-header-card">
+            <div class="profile-main">
+                <div class="profile-photo-wrapper">
+                    <div class="profile-photo-fallback" style="background: #1877f2;">
+                        <span>🏢</span>
+                    </div>
+                </div>
+                <div class="profile-details">
+                    <span class="role-badge">Apartment Entity</span>
+                    <h1>{{ apartment.name }}</h1>
+                    <p class="user-meta">{{ apartment.area }}, {{ apartment.city }}</p>
+                    <p class="user-meta" style="margin-top: 8px;">
+                        {% if avg_rating %}
+                            <strong style="color: #ff9f43; font-size: 1.1rem;">{{ avg_rating }} ⭐</strong> ({{ reviews.count }} reviews)
+                        {% else %}
+                            <span style="color: #64748b; font-style: italic;">No ratings yet</span>
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+             <div class="profile-actions">
+                <div class="building-id-badge" style="background: #0f172a; color: white; padding: 12px 20px; border-radius: 12px; text-align: center;">
+                    <span style="font-size: 0.65rem; text-transform: uppercase; display: block; opacity: 0.7;">Building ID</span>
+                    <span style="font-size: 1.2rem; font-weight: 800;">LIVO-{{ apartment.id|stringformat:"04d" }}</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- APARTMENT DETAILS -->
+        <div class="data-section mt-30">
+            <div class="section-top">
+                <h3>Property Overview</h3>
+                <p>Facilities and financials for this apartment.</p>
+            </div>
+            <div class="status-grid">
+                <div class="status-item">
+                    <span class="status-label">Total Rooms</span>
+                    <span class="status-value">{{ apartment.total_rooms }} Rooms</span>
+                </div>
+                <div class="status-item">
+                    <span class="status-label">Monthly Rent</span>
+                    <span class="status-value highlight">${{ apartment.rent_amount }}</span>
+                </div>
+                <div class="status-item">
+                    <span class="status-label">Features</span>
+                    <div class="tag-list" style="margin-top: 5px;">
+                        {% if apartment.has_wifi %}<span class="livo-tag mini">WiFi</span>{% endif %}
+                        {% if apartment.has_ac %}<span class="livo-tag mini">AC</span>{% endif %}
+                        {% if apartment.has_parking %}<span class="livo-tag mini">Parking</span>{% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PEOPLE SECTION -->
+        <div class="data-section mt-30">
+            <div class="section-top">
+                <h3>Management & Residents</h3>
+                <p>Who owns and lives in this building.</p>
+            </div>
+
+            <div class="people-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                <!-- Owner Card -->
+                <div class="mini-person-card">
+                    <span class="status-label">Managed By</span>
+                    {% if apartment.owner %}
+                        <a href="{% url 'public_profile' apartment.owner.id %}" class="person-link">
+                            <div class="circle mini">
+                                {% if apartment.owner.profile_image %}
+                                    <img src="{{ apartment.owner.profile_image.url }}" alt="{{ apartment.owner.username }}">
+                                {% else %}
+                                    <div class="avatar-placeholder">{{ apartment.owner.first_name|first|upper }}</div>
+                                {% endif %}
+                            </div>
+                            <span>{{ apartment.owner.get_full_name|default:apartment.owner.username }}</span>
+                        </a>
+                    {% else %}
+                        <p class="empty-text">No owner registered</p>
+                    {% endif %}
+                </div>
+
+                <!-- Residents Card -->
+                <div class="mini-person-card">
+                    <span class="status-label">Current Residents</span>
+                    <div class="resident-avatars" style="display: flex; gap: 8px; margin-top: 8px;">
+                        {% for record in residents %}
+                            <a href="{% url 'public_profile' record.resident.id %}" title="{{ record.resident.username }}">
+                                <div class="circle mini">
+                                    {% if record.resident.profile_image %}
+                                        <img src="{{ record.resident.profile_image.url }}" alt="{{ record.resident.username }}">
+                                    {% else %}
+                                        <div class="avatar-placeholder">{{ record.resident.first_name|first|upper }}</div>
+                                    {% endif %}
+                                </div>
+                            </a>
+                        {% empty %}
+                            <p class="empty-text">No active residents</p>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- REVIEWS SECTION -->
+        <div class="data-section mt-30">
+            <div class="section-top">
+                <h3>Resident Experiences</h3>
+                <p>What people are saying about living here.</p>
+            </div>
+            <div class="reviews-list">
+             {% for review in reviews %}
+                    <div class="review-item" style="padding: 20px; border-bottom: 1px solid #f1f5f9;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <div class="circle mini">
+                                    {% if review.reviewer.profile_image %}
+                                        <img src="{{ review.reviewer.profile_image.url }}" alt="{{ review.reviewer.username }}">
+                                    {% else %}
+                                        <div class="avatar-placeholder">{{ review.reviewer.first_name|first|upper }}</div>
+                                    {% endif %}
+                                </div>
+                                <strong style="font-size: 0.95rem;">{{ review.reviewer.username }}</strong>
+                            </div>
+                            <span style="color: #ff9f43; font-weight: 700;">{{ review.rating }} ⭐</span>
+                        </div>
+                        <p style="color: #475569; font-size: 0.95rem; line-height: 1.5; margin: 0;">"{{ review.comment }}"</p>
+                        <span style="display: block; font-size: 0.75rem; color: #94a3b8; margin-top: 10px;">{{ review.created_at|date:"F Y" }}</span>
+                    </div>
+                {% empty %}
+                    <p class="empty-text">No reviews for this property yet.</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .apartment-theme { background: #fafbfc; min-height: 100vh; padding: 60px 0; font-family: 'Inter', sans-serif; }
+    .small-container { max-width: 800px; margin: 0 auto; }
+
+    .profile-header-card { background: white; border-radius: 24px; padding: 40px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #e2e8f0; margin-bottom: 30px; box-shadow: 0 4px 6px rgba(0,0,0,0.02); }
+    .profile-main { display: flex; align-items: center; gap: 24px; }
+    .profile-photo-wrapper { width: 80px; height: 80px; }
+    .profile-photo-fallback { width: 100%; height: 100%; border-radius: 20px; display: flex; align-items: center; justify-content: center; font-size: 2rem; }
+
+    .role-badge { background: #ebf5ff; color: #1877f2; font-size: 0.7rem; font-weight: 800; text-transform: uppercase; padding: 4px 12px; border-radius: 50px; margin-bottom: 8px; display: inline-block; }
+    .profile-details h1 { font-size: 1.8rem; font-weight: 800; color: #0f172a; margin: 0; letter-spacing: -0.5px; }
+    .user-meta { color: #64748b; font-size: 0.95rem; margin-top: 4px; }
+
+    .data-section { background: white; border-radius: 24px; padding: 30px 40px; border: 1px solid #e2e8f0; }
+    .section-top { margin-bottom: 20px; }
+    .section-top h3 { font-size: 1.1rem; font-weight: 700; color: #0f172a; margin-bottom: 4px; }
+    .section-top p { font-size: 0.85rem; color: #64748b; }
+
+    .status-grid { display: grid; grid-template-columns: 1fr 1fr 1.5fr; gap: 15px; }
+    .status-item { padding: 15px; background: #f8fafc; border-radius: 16px; border: 1px solid #e2e8f0; }
+    .status-label { display: block; font-size: 0.7rem; font-weight: 800; color: #94a3b8; text-transform: uppercase; margin-bottom: 6px; }
+    .status-value { font-weight: 700; font-size: 1rem; color: #0f172a; }
+    .status-value.highlight { color: #10b981; }
+
+    .mini-person-card { background: #f8fafc; padding: 15px; border-radius: 16px; border: 1px solid #e2e8f0; }
+    .person-link { display: flex; align-items: center; gap: 10px; text-decoration: none; color: #0f172a; font-weight: 600; margin-top: 8px; }
+
+    .circle.mini { width: 32px; height: 32px; border-radius: 50%; overflow: hidden; background: #e4e6eb; }
+    .circle.mini img { width: 100%; height: 100%; object-fit: cover; }
+    .avatar-placeholder { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; font-weight: 700; color: #65676b; }
+
+    .tag-list { display: flex; flex-wrap: wrap; gap: 6px; }
+    .livo-tag.mini { font-size: 0.7rem; padding: 3px 8px; background: #e0f2fe; color: #0369a1; font-weight: 700; border-radius: 4px; }
+
+    .mt-30 { margin-top: 30px; }
+    .empty-text { color: #94a3b8; font-style: italic; font-size: 0.85rem; }
+</style>
+{% endblock %}
