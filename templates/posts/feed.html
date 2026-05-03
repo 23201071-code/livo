@@ -98,3 +98,53 @@
                     </a>
                 </div>
             </div>
+            </aside>
+
+
+        <!-- MAIN CONTENT (Post Stream) -->
+        <main class="feed-main-content">
+            <div class="post-stream">
+            {% if post_type == 'HELP' %}
+                <!-- HOUSEHELP DIRECTORY CARDS -->
+                {% for help in househelps %}
+                    <article class="social-card help-card">
+                        <div class="card-header">
+                            <div class="author-info">
+                                <a href="{% url 'public_profile' help.user.id %}" class="author-avatar circle">
+                                    {% if help.user.profile_image %}
+                                        <img src="{{ help.user.profile_image.url }}" alt="{{ help.user.first_name }}">
+                                    {% else %}
+                                        <div class="avatar-placeholder">{{ help.user.first_name|first|upper }}</div>
+                                    {% endif %}
+                                </a>
+                                <div class="author-details">
+                                    <a href="{% url 'public_profile' help.user.id %}" style="text-decoration: none;">
+                                        <h2 class="author-name" style="margin: 0;">{{ help.user.get_full_name|default:help.user.username }}</h2>
+                                    </a>
+                                    <span class="role-badge house_help">House Help Professional</span>
+                                </div>
+                            </div>
+                            <div class="card-location" style="display: flex; align-items: center; gap: 4px; color: #1877f2; font-size: 0.8rem; font-weight: 700;">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" viewBox="0 0 16 16">
+                                    <path d="M8 16s6-5.686 6-10A6 6 0 0 0 2 6c0 4.314 6 10 6 10zm0-7a3 3 0 1 1 0-6 3 3 0 0 1 0 6z"/>
+                                </svg>
+                                {{ help.area|default:help.city }}
+                            </div>
+                        </div>
+
+                        <div class="card-body">
+                            <div class="help-stats">
+                                <div class="help-stat highlight"><strong>৳{{ help.expected_salary }}</strong>/mo Expected</div>
+                                <div class="help-stat">
+                                    {% if help.availability %}
+                                        <span style="color: #27ae60; font-weight: 700;">● Available Now</span>
+                                    {% else %}
+                                        <span style="color: #94a3b8; font-weight: 700;">● Currently Busy</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+
+
+                            <div class="tag-list help-skills">
+                                  {% for skill in help.skills.all %}
