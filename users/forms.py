@@ -1,6 +1,6 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
-from .models import User, PreferenceTag
+from users.models import User, PreferenceTag
 from househelp.models import SkillTag
 
 
@@ -56,7 +56,8 @@ class UserSignUpForm(UserCreationForm):
     expected_salary = forms.IntegerField(
         required=False,
         min_value=0,
-        widget=forms.NumberInput(attrs={'placeholder': 'Enter expected salary (e.g. 8000)', 'class': 'form-control'})
+        widget=forms.NumberInput(
+            attrs={'placeholder': 'Enter expected salary (e.g. 8000)', 'class': 'form-control', 'min': '0'})
     )
 
     city = forms.CharField(
@@ -67,6 +68,16 @@ class UserSignUpForm(UserCreationForm):
     area = forms.CharField(
         required=False,
         widget=forms.TextInput(attrs={'placeholder': 'e.g. Gulshan', 'class': 'form-control'})
+    )
+
+    educational_institution = forms.CharField(
+        required=False,
+        widget=forms.TextInput(attrs={'placeholder': 'e.g. Dhaka University', 'class': 'form-control'})
+    )
+
+    workplace = forms.CharField(
+        required=False,
+        widget=forms.TextInput(attrs={'placeholder': 'e.g. Google or Freelance', 'class': 'form-control'})
     )
 
     class Meta(UserCreationForm.Meta):
@@ -89,7 +100,9 @@ class ProfileUpdateForm(forms.ModelForm):
             'gender': forms.Select(attrs={'class': 'form-select'}),
         }
 
+
 from users.models import LifestylePreference
+
 
 class LifestylePreferenceForm(forms.ModelForm):
     class Meta:
@@ -101,3 +114,4 @@ class LifestylePreferenceForm(forms.ModelForm):
             'educational_institution': forms.TextInput(attrs={'class': 'form-control'}),
             'workplace': forms.TextInput(attrs={'class': 'form-control'}),
         }
+

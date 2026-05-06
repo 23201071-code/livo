@@ -55,14 +55,14 @@ def dashboard(request):
     user_reviews = user.received_reviews.all().order_by('-created_at')
     avg_rating = user_reviews.aggregate(Avg('rating'))['rating__avg']
 
-    #from posts.models import Post
-    #user_posts = Post.objects.filter(user=user).order_by('-created_at')
+    from posts.models import Post
+    user_posts = Post.objects.filter(user=user).order_by('-created_at')
 
     context = {
         'user': user,
         'user_reviews': user_reviews,
         'avg_rating': round(avg_rating, 1) if avg_rating else None,
-        #'user_posts': user_posts,
+        'user_posts': user_posts,
     }
 
     if user.role == 'ROOMMATE':

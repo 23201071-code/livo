@@ -3,11 +3,14 @@ from django.core.exceptions import ValidationError
 from users.models import User
 from apartments.models import Apartment
 
+from django.core.validators import MinValueValidator
+
 
 # Create your models here.
 class Post(models.Model):
     POST_TYPE_CHOICES = [
         ('ROOM', 'Room Listing'),
+        ('FOOD', 'Food Post'),
         ('HELP', 'Househelp Post'),
     ]
 
@@ -19,10 +22,11 @@ class Post(models.Model):
     image = models.ImageField(upload_to='post_images/', blank=True, null=True)
 
     # NEW: Specific listing price (Price per person for Roommates, Total Rent for Owners, Meal price for Vendors)
-    price = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    price = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True,
+                                validators=[MinValueValidator(0)])
 
     # Simple counter as requested (No list of users)
-    likes = models.IntegerField(default=0)
+    likes = models.IntegerField(default=0, validators=[MinValueValidator(0)])
 
     # link to a physical apartment if this is a ROOM listing
     apartment = models.ForeignKey(Apartment, on_delete=models.SET_NULL, null=True, blank=True, related_name='listings')

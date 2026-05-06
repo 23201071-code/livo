@@ -154,6 +154,24 @@
                 </div>
 
                 <div id="roommate-fields" class="dynamic-section" style="display: none;">
+                    <div class="preference-group">
+                        <h3 class="category-heading">Professional & Educational Background</h3>
+                        <div class="form-layout">
+                            <div class="field-split">
+                                <div class="field-item">
+                                    <label>Educational Institution</label>
+                                    {{ form.educational_institution }}
+                                    {% if form.educational_institution.errors %}<div class="field-error">{{ form.educational_institution.errors }}</div>{% endif %}
+                                </div>
+                                <div class="field-item">
+                                    <label>Workplace</label>
+                                    {{ form.workplace }}
+                                    {% if form.workplace.errors %}<div class="field-error">{{ form.workplace.errors }}</div>{% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                     {% for category, tags in grouped_preferences.items %}
                     <div class="preference-group">
                         <h3 class="category-heading">{{ category }}</h3>

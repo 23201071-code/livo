@@ -14,6 +14,8 @@ class ApartmentForm(forms.ModelForm):
             'name': forms.TextInput(attrs={'placeholder': 'e.g. Silver Oak Residency, Unit 4B'}),
             'area': forms.TextInput(attrs={'placeholder': 'e.g. Manhattan or Downtown'}),
             'city': forms.TextInput(attrs={'placeholder': 'e.g. New York'}),
+            'rent_amount': forms.NumberInput(attrs={'min': '0'}),
+            'total_rooms': forms.NumberInput(attrs={'min': '1'}),
         }
 
     def __init__(self, *args, **kwargs):

@@ -11,7 +11,7 @@ class PostForm(forms.ModelForm):
             'description': forms.Textarea(attrs={'rows': 4, 'placeholder': 'Describe your listing or offering...'}),
             'title': forms.TextInput(attrs={'placeholder': 'e.g., Luxury Master Bedroom in city center'}),
             'message_link': forms.TextInput(attrs={'placeholder': 't.me/username or https://wa.me/...'}),
-            'price': forms.NumberInput(attrs={'placeholder': '0.00'}),
+            'price': forms.NumberInput(attrs={'placeholder': '0.00', 'min': '0'}),
         }
 
     def clean_message_link(self):

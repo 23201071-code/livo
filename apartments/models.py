@@ -1,4 +1,5 @@
 from django.db import models
+from django.core.validators import MinValueValidator
 from users.models import User
 
 
@@ -10,10 +11,11 @@ class Apartment(models.Model):
     area = models.CharField(max_length=100, default="", help_text="e.g. Manhattan, Gulshan, or Downtown")
 
     # Financials
-    rent_amount = models.DecimalField(max_digits=10, decimal_places=2, help_text="Total rent for the apartment")
+    rent_amount = models.DecimalField(max_digits=10, decimal_places=2, help_text="Total rent for the apartment",
+                                      validators=[MinValueValidator(0)])
 
     # physical details
-    total_rooms = models.IntegerField(default=1)
+    total_rooms = models.IntegerField(default=1, validators=[MinValueValidator(1)])
     has_wifi = models.BooleanField(default=False)
     has_parking = models.BooleanField(default=False)
     has_ac = models.BooleanField(default=False)

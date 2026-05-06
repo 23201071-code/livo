@@ -33,10 +33,14 @@
                                 <input type="text" name="area" placeholder="e.g. Gulshan" value="{{ request.GET.area }}">
                             </div>
                             <div class="input-group">
+                                <label>Educational Institution</label>
+                                <input type="text" name="institution" placeholder="e.g. Dhaka University" value="{{ request.GET.institution }}">
+                            </div>
+                            <div class="input-group">
                                 <label>Max Budget</label>
                                 <div class="price-input-wrapper">
                                     <span class="currency">৳</span>
-                                    <input type="number" name="max_price" placeholder="Rent limit" value="{{ request.GET.max_price }}">
+                                    <input type="number" name="max_price" placeholder="Rent limit" value="{{ request.GET.max_price }}" min="0">
                                 </div>
                             </div>
                         {% elif post_type == 'FOOD' %}
@@ -48,7 +52,7 @@
                                 <label>Max Price</label>
                                 <div class="price-input-wrapper">
                                     <span class="currency">$</span>
-                                    <input type="number" name="max_price" placeholder="Budget" value="{{ request.GET.max_price }}">
+                                    <input type="number" name="max_price" placeholder="Budget" value="{{ request.GET.max_price }}" min="0">
                                 </div>
                             </div>
                         {% elif post_type == 'HELP' %}
@@ -77,7 +81,7 @@
                                 <label>Max Expected Salary</label>
                                 <div class="price-input-wrapper">
                                     <span class="currency">৳</span>
-                                    <input type="number" name="max_salary" placeholder="Salary limit" value="{{ request.GET.max_salary }}">
+                                    <input type="number" name="max_salary" placeholder="Salary limit" value="{{ request.GET.max_salary }}" min="0">
                                 </div>
                             </div>
 

@@ -31,6 +31,21 @@
                         {% endif %}
                     </p>
 
+                    {% if target_user.role == 'ROOMMATE' and profile %}
+                        {% if profile.educational_institution or profile.workplace %}
+                        <p class="user-meta" style="margin-top: 4px; font-weight: 500; color: #475569;">
+                            {% if profile.educational_institution %}
+                                🎓 {{ profile.educational_institution }}
+                            {% endif %}
+                            {% if profile.educational_institution and profile.workplace %}
+                                 &middot;
+                            {% endif %}
+                            {% if profile.workplace %}
+                                💼 {{ profile.workplace }}
+                            {% endif %}
+                        </p>
+                        {% endif %}
+                    {% endif %}
                 </div>
             </div>
             <div class="profile-actions">
@@ -51,7 +66,7 @@
         </div>
         {% endif %}
 
-          <!-- LIFESTYLE PREFERENCES -->
+        <!-- LIFESTYLE PREFERENCES -->
 
         <div class="data-section">
             <div class="section-top">
@@ -104,7 +119,7 @@
         </div>
         {% endif %}
 
-         <!-- REVIEWS SECTION -->
+        <!-- REVIEWS SECTION -->
         <div class="data-section mt-30">
             <div class="section-top">
                 <h3>Reviews</h3>

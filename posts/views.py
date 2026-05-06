@@ -105,10 +105,19 @@ def post_feed(request, post_type):
         if post_type == 'ROOM':
             area = request.GET.get('area')
             city = request.GET.get('city')
+            institution = request.GET.get('institution')
+
             if area:
                 posts = posts.filter(apartment__area__icontains=area)
             if city:
                 posts = posts.filter(apartment__city__icontains=city)
+            if institution:
+                from django.db.models import Q
+                posts = posts.filter(
+                    Q(user__lifestyle_preference__educational_institution__icontains=institution) |
+                    Q(apartment__residents__resident__lifestyle_preference__educational_institution__icontains=institution,
+                      apartment__residents__is_active=True)
+                ).distinct()
             if max_price and max_price.replace('.', '', 1).isdigit():
                 posts = posts.filter(price__lte=float(max_price))
 

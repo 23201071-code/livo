@@ -20,6 +20,21 @@
                     <span class="role-badge">Roommate</span>
                     <h1>{{ user.get_full_name|default:user.username }}</h1>
                     <p class="user-meta" style="margin-bottom: 8px;">{{ user.email }} &middot; {{ user.phone|default:"No phone set" }}</p>
+
+                    {% if profile.educational_institution or profile.workplace %}
+                    <p class="user-meta" style="margin-top: 0; font-weight: 500; color: #475569;">
+                        {% if profile.educational_institution %}
+                            🎓 {{ profile.educational_institution }}
+                        {% endif %}
+                        {% if profile.educational_institution and profile.workplace %}
+                             &middot;
+                        {% endif %}
+                        {% if profile.workplace %}
+                            💼 {{ profile.workplace }}
+                        {% endif %}
+                    </p>
+                    {% endif %}
+
                     <p class="user-meta" style="margin-top: 0;">
                         {% if avg_rating %}
                             <strong style="color: #ff9f43; font-size: 1.1rem;">{{ avg_rating }} ⭐</strong> ({{ user_reviews.count }} reviews received)
