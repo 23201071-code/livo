@@ -16,7 +16,6 @@ class Review(models.Model):
 
     reviewer = models.ForeignKey(User, on_delete=models.CASCADE, related_name='reviews_given')
 
-    # Review Target: Can be a Person OR an Apartment
     reviewed_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='received_reviews', null=True,
                                       blank=True)
     reviewed_apartment = models.ForeignKey(Apartment, on_delete=models.CASCADE, related_name='reviews', null=True,
@@ -34,7 +33,6 @@ class Review(models.Model):
         if self.reviewed_user and self.reviewed_apartment:
             raise ValidationError("A review cannot target both a user and an apartment simultaneously.")
 
-        # Prevent self-reviewing
         if self.reviewed_user == self.reviewer:
             raise ValidationError("You cannot review yourself.")
 

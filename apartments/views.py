@@ -15,19 +15,15 @@ def add_apartment(request):
                                "You can only have one active apartment at a time. Please remove your current apartment first.")
                 return redirect('dashboard')
 
-        # PASSING user=request.user for dynamic labels
         form = ApartmentForm(request.POST, user=request.user)
         if form.is_valid():
             apartment = form.save(commit=False)
 
-            # Logic: If owner is adding, set the owner field.
             if request.user.role == 'HOUSE_OWNER':
                 apartment.owner = request.user
 
-            # Save the apartment
             apartment.save()
 
-            # Logic: If roommate is adding, link them as a resident immediately
             if request.user.role == 'ROOMMATE':
                 ResidentRecord.objects.create(
                     resident=request.user,
@@ -48,7 +44,6 @@ def add_apartment(request):
 @login_required
 def join_apartment(request):
     if request.method == 'POST':
-        # Roommates: limit to 1 active apartment. Owners: no limit.
         if request.user.role == 'ROOMMATE':
             if ResidentRecord.objects.filter(resident=request.user, is_active=True).exists():
                 messages.error(request,
@@ -57,7 +52,6 @@ def join_apartment(request):
 
         raw_id = request.POST.get('building_id_input', '').strip()
 
-        # Clean the input: Extract numbers if they typed "LIVO-004"
         clean_id = ''.join(filter(str.isdigit, raw_id))
 
         if not clean_id:
@@ -68,7 +62,6 @@ def join_apartment(request):
             apartment = Apartment.objects.get(id=int(clean_id))
 
             if request.user.role == 'HOUSE_OWNER':
-                # Owners claim the apartment as their property
                 if apartment.owner == request.user:
                     messages.warning(request, f"You already own {apartment.name}.")
                     return redirect('dashboard')
@@ -79,7 +72,6 @@ def join_apartment(request):
                 apartment.save()
                 messages.success(request, f"Success! {apartment.name} has been registered as your property.")
             else:
-                # Roommates join as residents
                 if ResidentRecord.objects.filter(resident=request.user, apartment=apartment, is_active=True).exists():
                     messages.warning(request, f"You are already registered to {apartment.name}.")
                     return redirect('dashboard')
@@ -88,7 +80,6 @@ def join_apartment(request):
                     messages.warning(request, "You already own this property.")
                     return redirect('dashboard')
 
-                # Update or create the residency record to handle rejoining
                 record, created = ResidentRecord.objects.update_or_create(
                     resident=request.user,
                     apartment=apartment,
@@ -136,7 +127,6 @@ def apartment_profile(request, apartment_id):
     reviews = apartment.reviews.all().order_by('-created_at')
     avg_rating = reviews.aggregate(Avg('rating'))['rating__avg']
 
-    # Get active residents
     residents = ResidentRecord.objects.filter(apartment=apartment, is_active=True).select_related('resident')
 
     context = {

@@ -15,7 +15,6 @@ def create_post(request):
         form = PostForm(request.POST, request.FILES, user=request.user)
         if form.is_valid():
             post = form.save(commit=False)
-            # User is already validated by form logic but we explicitly set it for clarity
             post.user = request.user
             post.save()
             messages.success(request, f"Your {post.get_type_display()} has been published successfully!")
@@ -62,13 +61,11 @@ def post_feed(request, post_type):
 
     category_names = {
         'ROOM': 'Roommate Listings',
-        'FOOD': 'Meal Discoveries',
         'HELP': 'Household Services Directory'
     }
     context['category_name'] = category_names.get(post_type, 'Community Wall')
 
     if post_type == 'HELP':
-        # HELP feed queries Househelp profiles directly, not Posts.
         from househelp.models import Househelp, SkillTag
         helps = Househelp.objects.all().select_related('user')
 
@@ -89,12 +86,10 @@ def post_feed(request, post_type):
 
         context['househelps'] = helps.distinct()
         context['skills'] = SkillTag.objects.all()
-        # Pass selected skills back to context for checkbox state
         context['selected_skills'] = [int(sid) for sid in skill_ids if sid.isdigit()]
 
 
     else:
-        # ROOM and FOOD feeds query Posts.
         posts = Post.objects.filter(type=post_type, availability=True) \
             .order_by('-created_at') \
             .select_related('user', 'apartment') \
@@ -120,16 +115,6 @@ def post_feed(request, post_type):
                 ).distinct()
             if max_price and max_price.replace('.', '', 1).isdigit():
                 posts = posts.filter(price__lte=float(max_price))
-
-
-        elif post_type == 'FOOD':
-            meal_type = request.GET.get('meal_type')
-            if max_price and max_price.replace('.', '', 1).isdigit():
-                posts = posts.filter(price__lte=float(max_price))
-            if meal_type:
-                # Basic text match in title/description for meal types since VENDORS use posts.
-                from django.db.models import Q
-                posts = posts.filter(Q(title__icontains=meal_type) | Q(description__icontains=meal_type))
 
         context['posts'] = posts
 

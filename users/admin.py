@@ -7,11 +7,9 @@ from .models import User, PreferenceTag, LifestylePreference
 
 @admin.register(User)
 class CustomUserAdmin(UserAdmin):
-    # Display these fields in the list view
     list_display = ('email', 'first_name', 'last_name', 'role', 'gender', 'verification_status', 'is_staff')
     list_filter = ('role', 'gender', 'verification_status', 'is_staff')
 
-    # Organize fields in the edit/add forms
     fieldsets = UserAdmin.fieldsets + (
         ('Livo Custom Fields',
          {'fields': ('contact_link', 'profile_image', 'phone', 'gender', 'role', 'verification_status')}),

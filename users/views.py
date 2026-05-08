@@ -108,33 +108,26 @@ def signup(request):
     if request.method == 'POST':
         form = UserSignUpForm(request.POST, request.FILES)
         if form.is_valid():
-            # 1. Create the User object
             user = form.save()
-
-            # 2. Extract and handle role-specific data
             role = user.role
 
             if role == 'ROOMMATE':
-                # Create Lifestyle Profile and link tags
                 profile = LifestylePreference.objects.create(user=user)
                 selected_preferences = form.cleaned_data.get('preferences')
                 if selected_preferences:
                     profile.preferences.set(selected_preferences)
 
             elif role == 'HOUSE_HELP':
-                # Create Househelp Profile and link skills
                 profile = Househelp.objects.create(user=user)
                 selected_skills = form.cleaned_data.get('skills')
                 if selected_skills:
                     profile.skills.set(selected_skills)
 
-            # 3. Log the user in and redirect
             login(request, user)
             return redirect('landing')
     else:
         form = UserSignUpForm()
 
-    # Group preferences for categorized display in the template
     grouped_preferences = {}
     for cat_code, cat_name in PreferenceTag.CATEGORY_CHOICES:
         tags = PreferenceTag.objects.filter(category=cat_code)
@@ -176,7 +169,6 @@ def public_profile(request, user_id):
         'avg_rating': round(avg_rating, 1) if avg_rating else None,
     }
 
-    # Passing role-specific profiles if they exist
     if target_user.role == 'ROOMMATE':
         context['profile'] = LifestylePreference.objects.filter(user=target_user).first()
     elif target_user.role == 'HOUSE_HELP':

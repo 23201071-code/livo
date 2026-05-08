@@ -18,7 +18,6 @@ def add_review(request):
             if reviewed_user_id:
                 reviewed_user = get_object_or_404(User, id=reviewed_user_id)
 
-                # Prevent self review
                 if reviewed_user == request.user:
                     messages.error(request, "You cannot review yourself.")
                 else:
@@ -50,7 +49,6 @@ def add_review(request):
         else:
             messages.error(request, "Please provide rating and comment.")
 
-        # Redirect back to where they came from
         return redirect(request.META.get('HTTP_REFERER', 'dashboard'))
 
     return redirect('dashboard')

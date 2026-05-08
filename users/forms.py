@@ -40,7 +40,6 @@ class UserSignUpForm(UserCreationForm):
         widget=forms.URLInput(attrs={'placeholder': 'e.g. LinkedIn or Portfolio URL', 'class': 'form-control'})
     )
 
-    # Role-Specific Master Lists (Handled in Step 3)
     preferences = forms.ModelMultipleChoiceField(
         queryset=PreferenceTag.objects.all(),
         required=False,

@@ -11,9 +11,9 @@ class ApartmentForm(forms.ModelForm):
         ]
         widgets = {
             'address': forms.Textarea(attrs={'rows': 2, 'placeholder': 'Full street address...'}),
-            'name': forms.TextInput(attrs={'placeholder': 'e.g. Silver Oak Residency, Unit 4B'}),
-            'area': forms.TextInput(attrs={'placeholder': 'e.g. Manhattan or Downtown'}),
-            'city': forms.TextInput(attrs={'placeholder': 'e.g. New York'}),
+            'name': forms.TextInput(attrs={'placeholder': 'e.g. Green Valley Apartment, Unit 4B'}),
+            'area': forms.TextInput(attrs={'placeholder': 'e.g. Gulshan or Banani'}),
+            'city': forms.TextInput(attrs={'placeholder': 'e.g. Dhaka'}),
             'rent_amount': forms.NumberInput(attrs={'min': '0'}),
             'total_rooms': forms.NumberInput(attrs={'min': '1'}),
         }
@@ -24,12 +24,8 @@ class ApartmentForm(forms.ModelForm):
 
         # Dynamic Label for Rent based on Role
         if user:
-            if user.role == 'ROOMMATE':
-                self.fields['rent_amount'].label = "Per Person Rent"
-                self.fields['rent_amount'].help_text = "Enter your individual monthly share."
-            else:
-                self.fields['rent_amount'].label = "Rent"
-                self.fields['rent_amount'].help_text = "Enter the total monthly rent for the property."
+            self.fields['rent_amount'].label = "Rent"
+            self.fields['rent_amount'].help_text = "Enter the total monthly rent for the property."
 
         # Apply CSS classes
         for field in self.fields.values():

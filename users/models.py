@@ -4,7 +4,6 @@ from django.contrib.auth.models import AbstractUser
 
 # Create your models here.
 class User(AbstractUser):
-    # Define your role choices
     ROLE_CHOICES = [
         ('ROOMMATE', 'Roommate'),
         ('HOUSE_OWNER', 'House Owner'),
@@ -54,7 +53,6 @@ class LifestylePreference(models.Model):
     workplace = models.CharField(max_length=255, blank=True, null=True)
     bio = models.TextField(max_length=500, blank=True, null=True, help_text="A short bio describing your lifestyle.")
 
-    # Users choose from the Master List (PreferenceTag)
     preferences = models.ManyToManyField(PreferenceTag, blank=True, related_name='users_with_preference')
 
     def __str__(self):

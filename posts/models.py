@@ -17,18 +17,12 @@ class Post(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='posts')
     type = models.CharField(max_length=20, choices=POST_TYPE_CHOICES)
     title = models.CharField(max_length=200)
-
-    # REFACTORED: Support single photo per post
     image = models.ImageField(upload_to='post_images/', blank=True, null=True)
-
-    # NEW: Specific listing price (Price per person for Roommates, Total Rent for Owners, Meal price for Vendors)
     price = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True,
                                 validators=[MinValueValidator(0)])
 
-    # Simple counter as requested (No list of users)
     likes = models.IntegerField(default=0, validators=[MinValueValidator(0)])
 
-    # link to a physical apartment if this is a ROOM listing
     apartment = models.ForeignKey(Apartment, on_delete=models.SET_NULL, null=True, blank=True, related_name='listings')
 
     message_link = models.URLField(max_length=500, blank=True, null=True)
@@ -40,15 +34,11 @@ class Post(models.Model):
     def clean(self):
         super().clean()
 
-        # FIXED: Safeguard against 'RelatedObjectDoesNotExist' during form validation
         try:
             current_user = self.user
         except (User.DoesNotExist, AttributeError):
-            # If user isn't assigned yet (common during early form validation), we skip role-based checks
-            # The view will handle assigning the user later.
             return
 
-        # 1. Role-based Posting Restrictions
         if self.type == 'ROOM' and current_user.role not in ['ROOMMATE', 'HOUSE_OWNER']:
             raise ValidationError(
                 f"Only Roommates and House Owners can create Room Listings. Your role is {current_user.get_role_display()}.")
@@ -61,7 +51,6 @@ class Post(models.Model):
             raise ValidationError(
                 f"Only House Help professionals can create Help Posts. Your role is {current_user.get_role_display()}.")
 
-        # 2. Apartment Link Requirements (STRICTLY FORCED)
         if self.type == 'ROOM' and not self.apartment:
             raise ValidationError(
                 "Room Listings MUST be linked to a physical Apartment entity. Please create/select an apartment first.")
